@@ -1,4 +1,4 @@
-describe('Writing a Spec', () => {
+describe('Writing some tests', () => {
     it('is easy when you know how!', () => {
 
         // Given - Arrange
