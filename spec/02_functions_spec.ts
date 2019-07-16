@@ -1,255 +1,256 @@
-import { isEven } from "./utils";
-import { tassign } from 'tassign';
+//import { isEven } from '../src/utils';
+//import * as fromUtils from '../src/utils';
+import { formatName, isEven } from '../src/utils';
 
-describe('functions', () => {
-    describe('parameters etc.', () => {
-
-        it('you cannot overload functions in javascript', () => {
-
-            function formatName(first: string, last: string, mi?: string): string {
-                let fullName = `${last}, ${first}`;
-
-                return mi ? fullName += ` ${mi}.` : fullName;
-            }
-
-            expect(formatName('Han', 'Solo')).toBe('Solo, Han');
-            expect(formatName('Han', 'Solo', 'D')).toBe('Solo, Han D.');
-        });
-        it('default values for parameters', () => {
-            function add(a: number = 5, b: number = 10): number {
+describe('functions and objects', () => {
+    describe('function literals', () => {
+        it('the syntai', () => {
+            //named function
+            //int Add(int a, int b)
+            function add(a: number, b: number): number {
                 return a + b;
             }
+            expect(add(3, 2)).toBe(5);
 
-            expect(add(2, 2)).toBe(4);
-            expect(add(2)).toBe(12);
-            expect(add()).toBe(15);
-            expect(add(undefined, 5)).toBe(10);
+            //Anonymous functions
+            const substract = function (a: number, b: number): number {
+                return a - b;
+            }
+            expect(substract(3, 2)).toBe(1);
+
+            const multiply = (a: number, b: number): number => a * b;
+            expect(multiply(3, 2)).toBe(6);
+
+            const divide = (a: number, b: number) => a / b;
+            expect(divide(3, 3)).toBe(1);
+
+            const logIt = (msg: string): void => {
+                console.log(`At ${new Date().toISOString()}`);
+                console.log(`-->${msg}`);
+            }
+            logIt(`Hello, World!`)
+
+            const factorial = function fac(x: number) {
+
+            }
+            factorial(32);
+
         });
-        it('takes an arbitrary number of parameters', () => {
+        it('intro to higher-ordered functions', () => {
+            const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-            function add(a: number, b: number, ...rest: number[]): number {
-                const firstTwo = a + b;
-                return rest.reduce((x, y) => x + y, firstTwo);
-            }
+            //const evens = numbers.filter(function (n) { return n % 2 === 0 })
+            //const evens = numbers.filter(n => n % 2 === 0)
 
-            expect(add(2, 2)).toBe(4);
-            expect(add(1, 2, 3, 4, 5, 6, 7, 8, 9)).toBe(45);
-        });
-        it('duck typing', () => {
+            // function isEven(n: number): boolean {
+            //     return n % 2 === 0;
+            // }
+            const evens = numbers.filter(isEven)
+            //2 ???
 
-            interface MessageHaver { message: string }
-            function doIt(thing: MessageHaver) {
-                console.log(thing.message);
-            }
+            expect(evens).toEqual([2, 4, 6, 8]);
 
-            // doIt("hi");
-            const phoneCall = {
-                message: 'Call me',
-                from: 'Your Mom',
-                when: '8:00 a.m.'
-            }
-            doIt(phoneCall);
-
-            class PhoneCall {
-
-                returned: boolean;
-
-                constructor(public message: string, public from: string, private time: String) { }
-
-                return() {
-                    this.returned = true;
+            function isBiggerThan(x: number) {
+                return function (y: number) {
+                    return y > x;
                 }
             }
 
-            const call2 = new PhoneCall('Your car is ready', 'Car Shop', '8:00 AM');
-            call2.return();
-
-            expect(call2.from).toBe('Car Shop');
-
-            doIt(call2);
-
+            const topHalf = numbers.filter(isBiggerThan(4));
+            expect(topHalf).toEqual([5, 6, 7, 8, 9]);
         });
+        describe('arguments to functions', () => {
+            it('has no overloading', () => {
+                expect(formatName('Han', 'Solo')).toBe('Solo, Han');
+                expect(formatName('Han', 'Solo', 'D')).toBe('Solo, Han D.');
+            });
 
-        it('discriminated unions', () => {
-
-            interface Action {
-                type: string;
-            }
-            class NumberIncremented implements Action {
-                readonly type = 'Increment'
-                constructor(public incrementedBy: number) { }
-            }
-
-            class NumberDecremented {
-                readonly type = 'Decrement'
-                constructor(public decrementedBy: number) { }
-            }
-
-            class NumberReset {
-                readonly type = 'Reset'
-                constructor() { }
-            }
-
-
-            type Actions = NumberIncremented | NumberDecremented | NumberReset;
-            const actions: Actions[] = [
-                new NumberIncremented(3),
-                new NumberIncremented(2),
-                new NumberDecremented(1),
-                new NumberReset(),
-                new NumberIncremented(3),
-                new NumberIncremented(2)
-            ];
-
-            let num = 0;
-            actions.forEach(a => {
-                switch (a.type) {
-                    case 'Increment': {
-                        num += a.incrementedBy;
-                        return;
-                    }
-                    case 'Decrement': {
-                        num -= a.decrementedBy;
-                    }
-                    case 'Reset': {
-                        num = 0;
-                    }
+            it('having default values for arguments', () => {
+                function add(a: number = 20, b: number = 10) {
+                    return a + b;
                 }
-            })
-
-            expect(num).toBe(5);
-        });
-    });
-    describe('array methods as higher ordered functions', () => {
-        const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-        it('forEach allows you to visit each member of an array', () => {
-            numbers.forEach(e => console.log(e));
-        });
-        describe('methods that produce a new array', () => {
-            it('selecting specific elements of an array', () => {
-                const evens = numbers.filter(isEven);
-
-                expect(evens).toEqual([2, 4, 6, 8]);
-                expect(numbers).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+                expect(add(2, 2)).toBe(4);
+                expect(add(4)).toBe(14);
+                expect(add()).toBe(30);
+                expect(add(undefined, 5)).toBe(25);
             });
 
-            it('transforming an array from one thing to another', () => {
-
-                const doubled = numbers.map(n => n * 2);
-                expect(doubled).toEqual([2, 4, 6, 8, 10, 12, 14, 16, 18]);
-
-                const toStrings = numbers.map(n => n.toString());
-
-                expect(toStrings).toEqual(['1', '2', '3', '4', '5', '6', '7', '8', '9'])
-
-            });
-
-            it('a practice', () => {
-
-                // Just the doubled odd numbers
-                const odds = numbers
-                    .filter(n => !isEven(n))
-                    .map(n => n * 2);
-                expect(odds).toEqual([2, 6, 10, 14, 18]);
-            });
-            it('another practice', () => {
-                interface Vehicle {
-                    vin: string;
-                    makeAndModel: string;
-                    mileage: number;
-                }
-                const vehicles: Vehicle[] = [
-                    { vin: '9999', makeAndModel: 'Chevy Tahoe', mileage: 182000 },
-                    { vin: 'aka92', makeAndModel: 'Toyota Prius', mileage: 89999 },
-                    { vin: 'kduwi', makeAndModel: 'Ford Explorer', mileage: 99998 }
-                ];
-
-                // a low mileage vehicle is any vehicle with < 100_000 miles on it.
-                const lowMileageVehicles = vehicles // [,,,] all the vehicles
-                    .filter(v => v.mileage < 100_000) // [,,] just those vehicles with the right mileage
-                    .map(v => v.makeAndModel); // ["", ""] just the make and model plucked from each vehicle.
-
-                expect(lowMileageVehicles).toEqual(['Toyota Prius', 'Ford Explorer']);
-            });
-
-        });
-        describe('that return a single (scalar) value', () => {
-            describe('checking the membership of an array', () => {
-                it('does every member meet a requirements', () => {
-                    expect(numbers.every(isEven)).toBe(false);
-                });
-                it('does any member of the array meet the requirement', () => {
-                    expect(numbers.some(isEven)).toBe(true);
-                });
-            });
-            describe('boil down an array of things to just one thing', () => {
-                it('reducing an array of numbers - easy mode', () => {
-
-                    const total = numbers.reduce((s, n) => s + n);
-                    expect(total).toBe(45);
-
-                    const total2 = numbers.reduce((s, n) => s + n, 100);
-                    expect(total2).toBe(145);
-                });
-                it('a bigger example', () => {
-
-                    interface Vehicle {
-                        vin: string;
-                        makeAndModel: string;
-                        mileage: number;
-                    }
-                    const vehicles: Vehicle[] = [
-                        { vin: '9999', makeAndModel: 'Chevy Tahoe', mileage: 182000 },
-                        { vin: 'aka92', makeAndModel: 'Toyota Prius', mileage: 89999 },
-                        { vin: 'kduwi', makeAndModel: 'Ford Explorer', mileage: 99998 }
-                    ];
-
-
-
-
-                    interface Result {
-                        highMileageMakeAndModel: string;
-                        highMileageMileage: number;
-                        lowMileageMakeAndModel: string;
-                        lowMileageMileage: number;
-                    }
-
-                    const seed: Result = {
-                        highMileageMakeAndModel: null,
-                        highMileageMileage: -1,
-                        lowMileageMakeAndModel: null,
-                        lowMileageMileage: 3_000_000
-                    }
-
-                    const answer = vehicles.reduce((s: Result, n: Vehicle) => {
-
-                        let result: Result = tassign(s);
-
-                        if (n.mileage < s.lowMileageMileage) {
-                            result.lowMileageMakeAndModel = n.makeAndModel;
-                            result.lowMileageMileage = n.mileage;
+            it('has unioned constants', () => {
+                type SeatType = 'window' | 'aisle' | 'middle';
+                function assignSeat(seatType: SeatType): number {
+                    switch (seatType) {
+                        case 'window': {
+                            return 50;
                         }
-                        if (n.mileage > s.highMileageMileage) {
-                            result.highMileageMakeAndModel = n.makeAndModel;
-                            result.highMileageMileage = n.mileage;
+                        case 'aisle': {
+                            return 75;
                         }
-                        console.log(result);
-                        return result;
-                    }, seed);
+                        case 'middle': {
+                            return 40;
+                        }
+                    }
 
+                }
 
-
-                    const expectedResult: Result = {
-                        highMileageMakeAndModel: 'Chevy Tahoe',
-                        highMileageMileage: 182_000,
-                        lowMileageMakeAndModel: 'Toyota Prius',
-                        lowMileageMileage: 89_999
-                    };
-                    console.log(answer);
-                    expect(answer).toEqual(expectedResult);
-
-                });
+                expect(assignSeat('window')).toBe(50);
+                expect(assignSeat('aisle')).toBe(75);
             });
+
+            it('has enums', () => {
+                enum SeatType { Window, Aisle, Middle };
+                function assignSeat(seatType: SeatType): number {
+                    switch (seatType) {
+                        case SeatType.Window: {
+                            return 50;
+                        }
+                        case SeatType.Aisle: {
+                            return 75;
+                        }
+                        case SeatType.Middle: {
+                            return 40;
+                        }
+                    }
+
+                }
+                expect(assignSeat(SeatType.Window)).toBe(50);
+                expect(assignSeat(SeatType.Aisle)).toBe(75);
+            });
+
+            it('has rest parameters', () => {
+                function add(a: number, b: number, ...rest: number[]) {
+                    const firstTwo = a + b;
+                    return rest.reduce((s, n) => s + n, firstTwo);
+                }
+
+                expect(add(2, 2)).toBe(4);
+                expect(add(1, 2, 3, 4, 5, 6, 7, 8, 9)).toBe(45);
+            });
+
+            it('demo of a reducer', () => {
+
+                const state = 0;
+
+                const actions = ['inc', 'inc', 'dec', 'inc'];
+
+                const newState = actions.reduce((s, n) => {
+                    switch (n) {
+                        case 'inc': {
+                            return s + 1;
+                        }
+                        case 'dec': {
+                            return s - 1;
+                        }
+                    }
+                }, state)
+
+                expect(newState).toBe(2);
+            });
+        });        
+    });    
+    describe('objects', () => {
+        describe('anonymous objects', () => {
+           it('making one', () => {
+               
+            const actor = {
+                name: {
+                    firstName: 'Harrison',
+                    lastName: 'Ford'
+                },
+                roles: [
+                    'Han Solo',
+                    'Decker'
+                ]
+            };
+
+            expect(actor.name.firstName).toBe('Harrison');
+            expect(actor.roles.some(n => n === 'Decker')).toBe(true);
+           });
+
+
+           interface Loggable { message: string }
+           function logIt(thingy: Loggable) {
+               console.log(thingy.message);
+           }
+
+           // logIt('tacos');
+           const phoneCall = {
+               from: 'Stacey',
+               message: 'Get bread on the way home'
+           }
+
+           const email = {
+               to: 'Joe',
+               message: 'Call your mom'
+           }
+
+           logIt(phoneCall);
+           logIt(email); 
+        });
+        it('using interfaces for the shape of an object', () => {
+            //interface Person { first: string; last: string, mi?: string };
+            interface Person { first: string; last: string, getInfo: () => string };
+            // interface Person { first: string; last: string, mi?: string };
+            interface PersonWithMiddleInitial extends Person {
+                mi: string;
+            }
+            const cf: PersonWithMiddleInitial = {
+                first: 'Carrie',
+                last: 'Fisher',
+                mi: 'A',
+                getInfo: function () {
+                    return `Person ${this.first} ${this.last};`
+                }
+            }
+
+            const mh: Person = {
+                first: 'Mark',
+                last: 'Hamill',
+                getInfo: function () {
+                    return `Person ${this.first} ${this.last};`
+                }
+            }
+        });
+        it('has classes', () => {            
+           class Actor {
+
+                private mAge: number = 0;
+
+                constructor(public firstName: string, public lastName: string) { }
+
+                getInfo() {
+                    return `${this.lastName}, ${this.firstName}`;
+                }
+
+                get age(): number {
+                    return this.mAge;
+                }
+
+                set age(newValue: number) {
+                    this.mAge = newValue;
+                }
+            }
+
+            const ralph = new Actor('Ralph', 'Maccio');
+
+            expect(ralph.firstName).toBe('Ralph');
+            expect(ralph.lastName).toBe('Maccio');
+            expect(ralph.getInfo()).toBe('Maccio, Ralph');
+            ralph.age = 39;
+            expect(ralph.age).toBe(39);
+
+            class Employee extends Actor {
+                constructor(first: string, last: string, public salary: number) {
+                    super(first, last);
+                }
+            }
+
+            let peter = new Employee('Peter', 'Lewis', 50_000_000);
+
+
+            expect(peter.salary).toBe(50_000_000);  
+
+        });
+            
         });
     });
 });
