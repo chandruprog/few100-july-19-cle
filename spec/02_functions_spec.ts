@@ -145,46 +145,46 @@ describe('functions and objects', () => {
 
                 expect(newState).toBe(2);
             });
-        });        
-    });    
+        });
+    });
     describe('objects', () => {
         describe('anonymous objects', () => {
-           it('making one', () => {
-               
-            const actor = {
-                name: {
-                    firstName: 'Harrison',
-                    lastName: 'Ford'
-                },
-                roles: [
-                    'Han Solo',
-                    'Decker'
-                ]
-            };
+            it('making one', () => {
 
-            expect(actor.name.firstName).toBe('Harrison');
-            expect(actor.roles.some(n => n === 'Decker')).toBe(true);
-           });
+                const actor = {
+                    name: {
+                        firstName: 'Harrison',
+                        lastName: 'Ford'
+                    },
+                    roles: [
+                        'Han Solo',
+                        'Decker'
+                    ]
+                };
+
+                expect(actor.name.firstName).toBe('Harrison');
+                expect(actor.roles.some(n => n === 'Decker')).toBe(true);
+            });
 
 
-           interface Loggable { message: string }
-           function logIt(thingy: Loggable) {
-               console.log(thingy.message);
-           }
+            interface Loggable { message: string }
+            function logIt(thingy: Loggable) {
+                console.log(thingy.message);
+            }
 
-           // logIt('tacos');
-           const phoneCall = {
-               from: 'Stacey',
-               message: 'Get bread on the way home'
-           }
+            // logIt('tacos');
+            const phoneCall = {
+                from: 'Stacey',
+                message: 'Get bread on the way home'
+            }
 
-           const email = {
-               to: 'Joe',
-               message: 'Call your mom'
-           }
+            const email = {
+                to: 'Joe',
+                message: 'Call your mom'
+            }
 
-           logIt(phoneCall);
-           logIt(email); 
+            logIt(phoneCall);
+            logIt(email);
         });
         it('using interfaces for the shape of an object', () => {
             //interface Person { first: string; last: string, mi?: string };
@@ -210,8 +210,8 @@ describe('functions and objects', () => {
                 }
             }
         });
-        it('has classes', () => {            
-           class Actor {
+        it('has classes', () => {
+            class Actor {
 
                 private mAge: number = 0;
 
@@ -247,10 +247,9 @@ describe('functions and objects', () => {
             let peter = new Employee('Peter', 'Lewis', 50_000_000);
 
 
-            expect(peter.salary).toBe(50_000_000);  
+            expect(peter.salary).toBe(50_000_000);
 
         });
-            
-        });
+
     });
 });
